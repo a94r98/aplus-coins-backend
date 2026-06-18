@@ -7,9 +7,11 @@ import {
   resendVerificationSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
+  updateProfileSchema,
 } from '../controllers/auth.controller';
 import { validate } from '../middlewares/validation';
 import { authLimiter } from '../middlewares/rateLimiter';
+import { authenticate } from '../middlewares/auth';
 
 const router = Router();
 
@@ -20,5 +22,8 @@ router.post('/resend-verification', authLimiter, validate(resendVerificationSche
 router.post('/forgot-password', authLimiter, validate(forgotPasswordSchema), AuthController.forgotPassword);
 router.post('/reset-password', authLimiter, validate(resetPasswordSchema), AuthController.resetPassword);
 router.get('/countries', AuthController.getCountries);
+
+router.put('/profile', authenticate, validate(updateProfileSchema), AuthController.updateProfile);
+router.delete('/profile', authenticate, AuthController.deleteAccount);
 
 export default router;
