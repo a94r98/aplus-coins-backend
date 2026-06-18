@@ -35,6 +35,9 @@ CREATE TABLE IF NOT EXISTS users (
     last_ip VARCHAR(45),
     created_ip VARCHAR(45),
     
+    language VARCHAR(10) DEFAULT 'ar',
+    notifications_enabled BOOLEAN DEFAULT TRUE,
+    
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );

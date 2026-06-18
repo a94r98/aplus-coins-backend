@@ -76,7 +76,7 @@ export class WalletController {
       const cachedAv = cacheResult.rowCount ? BigInt(cacheResult.rows[0].balance || 0) : BigInt(0);
 
       const result = await query(
-        'SELECT id, username, email, vip_tier, referral_code, balance, pending_balance, total_earned, total_withdrawn, last_withdrawal_at, country, country_code FROM users WHERE id = $1',
+        'SELECT id, username, email, vip_tier, referral_code, balance, pending_balance, total_earned, total_withdrawn, last_withdrawal_at, country, country_code, language, notifications_enabled FROM users WHERE id = $1',
         [userId]
       );
       const user = result.rows[0];
@@ -110,6 +110,8 @@ export class WalletController {
           max_daily_ads: dailyLimit,
           country: user.country,
           country_code: user.country_code,
+          language: user.language,
+          notifications_enabled: user.notifications_enabled,
         },
       });
     } catch (error) {

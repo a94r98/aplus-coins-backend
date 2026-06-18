@@ -156,4 +156,70 @@ export class AuthController {
       next(error);
     }
   }
+
+  static async updateProfile(req: any, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user.id;
+      const { username, language, notifications_enabled } = req.body;
+      const { query } = require('../config/db');
+      
+      const fields: string[] = [];
+      const values: any[] = [];
+      let paramIndex = 1;
+
+      if (username !== undefined) {
+        fields.push(`username = $${paramIndex++}`);
+        values.push(username);
+      }
+      if (language !== undefined) {
+        fields.push(`language = $${paramIndex++}`);
+        values.push(language);
+      }
+      if (notifications_enabled !== undefined) {
+        fields.push(`notifications_enabled = $${paramIndex++}`);
+        values.push(notifications_enabled);
+      }
+
+      if (fields.length === 0) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'لم يتم تقديم أي حقول للتحديث',
+        });
+      }
+
+      values.push(userId);
+      const queryStr = `UPDATE users SET ${fields.join(', ')} WHERE id = $${paramIndex}`;
+      await query(queryStr, values);
+
+      res.status(200).json({
+        status: 'success',
+        message: 'تم تحديث البيانات بنجاح',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async deleteAccount(req: any, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user.id;
+      const { query } = require('../config/db');
+      
+      await query('DELETE FROM users WHERE id = $1', [userId]);
+      res.status(200).json({
+        status: 'success',
+        message: 'تم حذف الحساب بنجاح',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
+
+export const updateProfileSchema = z.object({
+  body: z.object({
+    username: z.string().min(3).max(50).optional(),
+    language: z.string().min(2).max(10).optional(),
+    notifications_enabled: z.boolean().optional(),
+  }),
+});
