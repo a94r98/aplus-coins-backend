@@ -76,7 +76,7 @@ export class WalletController {
       const cachedAv = cacheResult.rowCount ? BigInt(cacheResult.rows[0].balance || 0) : BigInt(0);
 
       const result = await query(
-        'SELECT username, email, vip_tier, referral_code, balance, pending_balance, total_earned, total_withdrawn, last_withdrawal_at, country, country_code FROM users WHERE id = $1',
+        'SELECT id, username, email, vip_tier, referral_code, balance, pending_balance, total_earned, total_withdrawn, last_withdrawal_at, country, country_code FROM users WHERE id = $1',
         [userId]
       );
       const user = result.rows[0];
@@ -95,6 +95,7 @@ export class WalletController {
       res.status(200).json({
         status: 'success',
         data: {
+          id: user.id,
           username: user.username,
           email: user.email,
           vip_tier: user.vip_tier,
