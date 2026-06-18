@@ -1,0 +1,398 @@
+{
+  "info": {
+    "name": "Ad Reward Platform API",
+    "description": "Production-ready backend API docs for Ad Reward Platform. Base URL: /api/v1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "endpoints": [
+    {
+      "name": "Register User",
+      "method": "POST",
+      "path": "/auth/register",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "request_body": {
+        "username": "johndoe",
+        "email": "john@example.com",
+        "password": "securepassword123",
+        "referralCode": "REF-ABC123-9999"
+      },
+      "responses": [
+        {
+          "status": 201,
+          "description": "User registered successfully",
+          "body": {
+            "status": "success",
+            "data": {
+              "user": {
+                "id": 2,
+                "username": "johndoe",
+                "email": "john@example.com",
+                "vip_tier": "FREE",
+                "referral_code": "REF-XYZ789-5678",
+                "referred_by": 1,
+                "balance": "0.0000",
+                "created_at": "2026-06-18T10:12:00.000Z"
+              },
+              "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Login User",
+      "method": "POST",
+      "path": "/auth/login",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "request_body": {
+        "email": "john@example.com",
+        "password": "securepassword123"
+      },
+      "responses": [
+        {
+          "status": 200,
+          "description": "Successful login",
+          "body": {
+            "status": "success",
+            "data": {
+              "user": {
+                "id": 2,
+                "username": "johndoe",
+                "email": "john@example.com",
+                "vip_tier": "FREE",
+                "referral_code": "REF-XYZ789-5678",
+                "referred_by": 1,
+                "balance": "0.0000",
+                "created_at": "2026-06-18T10:12:00.000Z"
+              },
+              "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Watch Ad",
+      "method": "POST",
+      "path": "/ads/watch",
+      "headers": {
+        "Authorization": "Bearer <JWT_TOKEN>",
+        "Content-Type": "application/json"
+      },
+      "request_body": {
+        "adId": "ad_zone_unit_456"
+      },
+      "responses": [
+        {
+          "status": 200,
+          "description": "Ad watch logged, reward added, and referral commissions distributed",
+          "body": {
+            "status": "success",
+            "data": {
+              "success": true,
+              "reward_amount": 0.1,
+              "new_balance": 0.1,
+              "ads_watched_today": 1,
+              "remaining_ads_today": 4
+            }
+          }
+        },
+        {
+          "status": 429,
+          "description": "Ad cooldown active (30 seconds limit between views)",
+          "body": {
+            "status": "error",
+            "message": "Ad cooldown active. Please wait 24 more seconds."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Ad History",
+      "method": "GET",
+      "path": "/ads/history",
+      "headers": {
+        "Authorization": "Bearer <JWT_TOKEN>"
+      },
+      "query_params": {
+        "limit": "50"
+      },
+      "responses": [
+        {
+          "status": 200,
+          "description": "Retrieve user's watched ad logs",
+          "body": {
+            "status": "success",
+            "results": 1,
+            "data": [
+              {
+                "id": 1,
+                "ad_id": "ad_zone_unit_456",
+                "reward_amount": "0.1000",
+                "watched_at": "2026-06-18T10:13:00.000Z"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Upgrade VIP Tier",
+      "method": "POST",
+      "path": "/wallet/upgrade",
+      "headers": {
+        "Authorization": "Bearer <JWT_TOKEN>",
+        "Content-Type": "application/json"
+      },
+      "request_body": {
+        "tier": "VIP1"
+      },
+      "responses": [
+        {
+          "status": 200,
+          "description": "Upgraded subscription tier successfully",
+          "body": {
+            "status": "success",
+            "data": {
+              "success": true,
+              "upgraded_to": "VIP1",
+              "cost": 50,
+              "new_balance": 5.25,
+              "expires_at": "2026-07-18T10:12:00.000Z"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Request Withdrawal",
+      "method": "POST",
+      "path": "/wallet/withdraw",
+      "headers": {
+        "Authorization": "Bearer <JWT_TOKEN>",
+        "Content-Type": "application/json"
+      },
+      "request_body": {
+        "amount": 15,
+        "walletAddress": "0x71C7656EC7ab88b098defB751B7401B5f6d8976F"
+      },
+      "responses": [
+        {
+          "status": 201,
+          "description": "Withdrawal request created successfully",
+          "body": {
+            "status": "success",
+            "data": {
+              "id": 3,
+              "amount": "15.0000",
+              "status": "PENDING",
+              "wallet_address": "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+              "created_at": "2026-06-18T10:15:00.000Z"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Withdrawals History",
+      "method": "GET",
+      "path": "/wallet/withdrawals",
+      "headers": {
+        "Authorization": "Bearer <JWT_TOKEN>"
+      },
+      "responses": [
+        {
+          "status": 200,
+          "description": "User's withdrawals list",
+          "body": {
+            "status": "success",
+            "results": 1,
+            "data": [
+              {
+                "id": 3,
+                "amount": "15.0000",
+                "status": "PENDING",
+                "wallet_address": "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+                "created_at": "2026-06-18T10:15:00.000Z",
+                "updated_at": "2026-06-18T10:15:00.000Z"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Referral Tree & Stats",
+      "method": "GET",
+      "path": "/referrals",
+      "headers": {
+        "Authorization": "Bearer <JWT_TOKEN>"
+      },
+      "responses": [
+        {
+          "status": 200,
+          "description": "Summary and list of multi-level downline referrals with commissions",
+          "body": {
+            "status": "success",
+            "data": {
+              "summary": {
+                "level1": 3,
+                "level2": 1,
+                "level3": 0,
+                "total_commissions": 12.85
+              },
+              "referrals": [
+                {
+                  "level": 1,
+                  "commission_earned": "3.5000",
+                  "created_at": "2026-06-10T08:00:00.000Z",
+                  "username": "referral_user_1",
+                  "email": "user1@test.com",
+                  "vip_tier": "VIP1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Unclaimed VIP Daily Share Pools",
+      "method": "GET",
+      "path": "/rewards/unclaimed",
+      "headers": {
+        "Authorization": "Bearer <JWT_TOKEN>"
+      },
+      "responses": [
+        {
+          "status": 200,
+          "description": "List of daily shares available for user to claim",
+          "body": {
+            "status": "success",
+            "results": 1,
+            "data": [
+              {
+                "id": 12,
+                "share_date": "2026-06-18T00:00:00.000Z",
+                "pool_share_amount": "5.5000",
+                "is_claimed": false
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Claim Daily VIP Share",
+      "method": "POST",
+      "path": "/rewards/claim",
+      "headers": {
+        "Authorization": "Bearer <JWT_TOKEN>",
+        "Content-Type": "application/json"
+      },
+      "request_body": {
+        "shareId": 12
+      },
+      "responses": [
+        {
+          "status": 200,
+          "description": "Daily share claimed successfully",
+          "body": {
+            "status": "success",
+            "data": {
+              "success": true,
+              "claimed_amount": 5.5,
+              "new_balance": 10.75
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin: Distribute Daily Reward Pool",
+      "method": "POST",
+      "path": "/admin/reward-pool/distribute",
+      "headers": {
+        "Authorization": "Bearer <ADMIN_JWT_TOKEN>",
+        "Content-Type": "application/json"
+      },
+      "request_body": {
+        "totalRevenue": 1000
+      },
+      "responses": [
+        {
+          "status": 200,
+          "description": "Daily pool split and distributed to VIPs using 50/15/35 logic",
+          "body": {
+            "status": "success",
+            "data": {
+              "poolId": 1,
+              "date": "2026-06-18",
+              "totalRevenue": 1000,
+              "poolShare": 500,
+              "referralShare": 150,
+              "platformShare": 350,
+              "vipsCount": 10,
+              "sharesCount": 10
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin: Approve/Reject Withdrawal",
+      "method": "POST",
+      "path": "/admin/withdrawals/process",
+      "headers": {
+        "Authorization": "Bearer <ADMIN_JWT_TOKEN>",
+        "Content-Type": "application/json"
+      },
+      "request_body": {
+        "withdrawalId": 3,
+        "status": "APPROVED"
+      },
+      "responses": [
+        {
+          "status": 200,
+          "description": "Withdrawal request approved/rejected",
+          "body": {
+            "status": "success",
+            "data": {
+              "id": 3,
+              "status": "APPROVED",
+              "refunded": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin: Get System Metrics",
+      "method": "GET",
+      "path": "/admin/stats",
+      "headers": {
+        "Authorization": "Bearer <ADMIN_JWT_TOKEN>"
+      },
+      "responses": [
+        {
+          "status": 200,
+          "description": "Retrieve system counts and totals",
+          "body": {
+            "status": "success",
+            "data": {
+              "total_users": 15,
+              "active_vips": 3,
+              "total_ads_watched": 154,
+              "total_withdrawn": 250,
+              "pending_withdrawals_count": 2
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
