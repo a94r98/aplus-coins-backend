@@ -10,33 +10,44 @@ interface AuthenticatedRequest extends Request {
   };
 }
 
-export const buyProductSchema = z.object({
-  productId: z.number().int().positive(),
+export const createOrderSchema = z.object({
+  category: z.enum(['CARDS', 'CHAT_COINS', 'GAMES', 'CURRENCY_EXCHANGE']),
+  productName: z.string().min(1),
+  coinsPrice: z.number().positive(),
+  details: z.record(z.any()),
 });
 
 export class StoreController {
-  static async getProducts(req: Request, res: Response, next: NextFunction) {
+  static async createOrder(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const products = await StoreService.getActiveProducts();
+      const userId = req.user!.id;
+      const { category, productName, coinsPrice, details } = req.body;
+
+      const order = await StoreService.createOrder(
+        userId,
+        category,
+        productName,
+        coinsPrice,
+        details
+      );
+
       res.status(200).json({
         status: 'success',
-        data: products,
+        message: 'تم تسجيل طلب الشراء بنجاح وجاري المراجعة',
+        data: order,
       });
     } catch (error) {
       next(error);
     }
   }
 
-  static async buyProduct(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  static async getOrderHistory(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const userId = req.user!.id;
-      const { productId } = req.body;
-
-      const result = await StoreService.buyProduct(userId, productId);
+      const orders = await StoreService.getOrderHistory(userId);
       res.status(200).json({
         status: 'success',
-        message: `Successfully purchased ${result.product_name}`,
-        data: result,
+        data: orders,
       });
     } catch (error) {
       next(error);

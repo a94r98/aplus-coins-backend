@@ -13,6 +13,7 @@ import {
   adProviderSchema,
   updateAdProviderSchema,
   updateEconomyConfigSchema,
+  rejectStoreOrderSchema,
 } from '../controllers/admin.controller';
 import { validate } from '../middlewares/validation';
 import { authenticate, requireAdmin } from '../middlewares/auth';
@@ -27,6 +28,11 @@ router.post('/reward-pool/distribute', validate(distributePoolSchema), AdminCont
 router.get('/stats', AdminController.getStats);
 router.get('/withdrawals', AdminController.getWithdrawals);
 router.get('/logs', AdminController.getLogs);
+
+// Store Orders admin routes
+router.get('/store-orders', AdminController.getStoreOrders);
+router.post('/store-orders/:id/approve', AdminController.approveStoreOrder);
+router.post('/store-orders/:id/reject', validate(rejectStoreOrderSchema), AdminController.rejectStoreOrder);
 
 // Production Hardening Admin Routes
 router.post('/system-state', validate(updateSystemStateSchema), AdminController.updateSystemState);

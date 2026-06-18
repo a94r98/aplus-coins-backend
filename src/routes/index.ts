@@ -8,6 +8,7 @@ import referralsRoutes from './referrals.routes';
 import adminRoutes from './admin.routes';
 import storeRoutes from './store.routes';
 import vipRoutes from './vip.routes';
+import notificationRoutes from './notification.routes';
 
 const router = Router();
 
@@ -20,5 +21,6 @@ router.use('/referrals', referralsRoutes);
 router.use('/admin', adminRoutes);
 router.use('/store', storeRoutes);
 router.use('/vip', vipRoutes);
+router.use('/notifications', notificationRoutes);
 
 export default router;

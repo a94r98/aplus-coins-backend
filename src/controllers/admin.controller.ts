@@ -441,4 +441,52 @@ export class AdminController {
       next(error);
     }
   }
+
+  static async getStoreOrders(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      const { StoreService } = require('../services/store.service');
+      const orders = await StoreService.getAdminOrders();
+      res.status(200).json({
+        status: 'success',
+        data: orders,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async approveStoreOrder(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      const orderId = parseInt(req.params.id, 10);
+      const { StoreService } = require('../services/store.service');
+      await StoreService.approveOrder(orderId);
+      res.status(200).json({
+        status: 'success',
+        message: 'تم قبول وتفعيل طلب الشراء بنجاح',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async rejectStoreOrder(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      const orderId = parseInt(req.params.id, 10);
+      const { rejectionReason } = req.body;
+      const { StoreService } = require('../services/store.service');
+      await StoreService.rejectOrder(orderId, rejectionReason);
+      res.status(200).json({
+        status: 'success',
+        message: 'تم رفض طلب الشراء وإعادة الكونزات للمستخدم بنجاح',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
+
+export const rejectStoreOrderSchema = z.object({
+  body: z.object({
+    rejectionReason: z.string().min(1, 'rejectionReason is required'),
+  }),
+});

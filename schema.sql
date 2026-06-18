@@ -460,4 +460,28 @@ ON CONFLICT (tier) DO UPDATE SET
     daily_earning_cap = EXCLUDED.daily_earning_cap,
     daily_ad_limit = EXCLUDED.daily_ad_limit;
 
+-- Create store_orders table
+CREATE TABLE IF NOT EXISTS store_orders (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    category VARCHAR(50) NOT NULL, -- 'CARDS', 'CHAT_COINS', 'GAMES', 'CURRENCY_EXCHANGE'
+    product_name VARCHAR(255) NOT NULL,
+    coins_price BIGINT NOT NULL, -- Stored in micro-units: 1 Coinz = 1,000,000 micro-units
+    details JSONB NOT NULL,
+    status VARCHAR(20) DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'APPROVED', 'REJECTED')),
+    rejection_reason TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create notifications table
+CREATE TABLE IF NOT EXISTS notifications (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    title VARCHAR(255) NOT NULL,
+    body TEXT NOT NULL,
+    type VARCHAR(50) DEFAULT 'GENERAL',
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 
