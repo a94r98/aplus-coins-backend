@@ -1,5 +1,6 @@
 import { query } from '../config/db';
 import { AppError } from '../middlewares/error';
+import { FcmService } from './fcm.service';
 
 export interface Notification {
   id: number;
@@ -24,7 +25,16 @@ export class NotificationService {
        RETURNING id, user_id, title, body, type, is_read, created_at`,
       [userId, title, body, type]
     );
-    return res.rows[0];
+    
+    const notification = res.rows[0];
+
+    // Trigger asynchronous push notification
+    FcmService.sendPushNotification(userId, title, body, {
+      type,
+      notificationId: String(notification.id)
+    }).catch(err => console.error('FCM push dispatch failed:', err));
+
+    return notification;
   }
 
   static async getUserNotifications(userId: number): Promise<Notification[]> {

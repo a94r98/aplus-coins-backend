@@ -160,7 +160,7 @@ export class AuthController {
   static async updateProfile(req: any, res: Response, next: NextFunction) {
     try {
       const userId = req.user.id;
-      const { username, language, notifications_enabled } = req.body;
+      const { username, language, notifications_enabled, fcm_token } = req.body;
       const { query } = require('../config/db');
       
       const fields: string[] = [];
@@ -178,6 +178,10 @@ export class AuthController {
       if (notifications_enabled !== undefined) {
         fields.push(`notifications_enabled = $${paramIndex++}`);
         values.push(notifications_enabled);
+      }
+      if (fcm_token !== undefined) {
+        fields.push(`fcm_token = $${paramIndex++}`);
+        values.push(fcm_token);
       }
 
       if (fields.length === 0) {
@@ -221,5 +225,6 @@ export const updateProfileSchema = z.object({
     username: z.string().min(3).max(50).optional(),
     language: z.string().min(2).max(10).optional(),
     notifications_enabled: z.boolean().optional(),
+    fcm_token: z.string().nullable().optional(),
   }),
 });
