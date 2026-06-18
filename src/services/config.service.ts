@@ -8,6 +8,7 @@ export interface SystemConfig {
   daily_checkin_reward: string;
   banner_click_reward: string;
   referral_signup_reward: string;
+  share_app_reward: string;
   coinz_iqd_rate: number;
   ad_reward_min: string;
   ad_reward_max: string;
@@ -54,6 +55,7 @@ export class ConfigService {
       daily_checkin_reward: row.daily_checkin_reward || '100000',
       banner_click_reward: row.banner_click_reward || '200000',
       referral_signup_reward: row.referral_signup_reward || '100000',
+      share_app_reward: row.share_app_reward || '5000000',
       coinz_iqd_rate: parseFloat(row.coinz_iqd_rate) || 1600.0,
       ad_reward_min: row.ad_reward_min || '10000',
       ad_reward_max: row.ad_reward_max || '20000',

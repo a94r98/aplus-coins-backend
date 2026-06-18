@@ -14,6 +14,7 @@ router.post('/claim', validate(claimShareSchema), RewardsController.claimShare);
 router.get('/daily-tasks/status', RewardsController.getDailyTasksStatus);
 router.post('/daily-tasks/check-in', RewardsController.claimCheckIn);
 router.post('/daily-tasks/banner-click', RewardsController.claimBannerClick);
+router.post('/daily-tasks/share-app', RewardsController.claimShareApp);
 
 router.get('/one-time-tasks', OneTimeTasksController.getTasks);
 router.post('/one-time-tasks/claim', validate(claimOneTimeTaskSchema), OneTimeTasksController.claimTask);
