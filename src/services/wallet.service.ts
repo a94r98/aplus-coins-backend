@@ -206,31 +206,24 @@ export class WalletService {
           throw new AppError('Your account has been flagged for review. Withdrawals are frozen.', 403);
         }
 
-        // Convert local currency amount to canonical base Coinz (secure server verification)
+        // Wallet operates purely in Coinz (secure server verification)
         const { ConfigService } = require('./config.service');
         const sysConfig = await ConfigService.getSystemConfig();
 
-        const rate = sysConfig.coinz_iqd_rate;
-        const minWithdrawalUsd = Number(sysConfig.withdrawal_minimum) / 1000000.0;
-        const maxWithdrawalUsd = Number(sysConfig.withdrawal_maximum) / 1000000.0;
+        const minWithdrawalCoins = Number(sysConfig.withdrawal_minimum) / 1000000.0;
+        const maxWithdrawalCoins = Number(sysConfig.withdrawal_maximum) / 1000000.0;
 
-        const isIraq = user.country === 'Iraq' || user.country === 'العراق' || user.country_code === 'IQ';
-        let amountInCoinz = amount;
-        if (isIraq) {
-          amountInCoinz = amount / rate;
+        const amountInCoinz = amount;
+
+        if (amountInCoinz < minWithdrawalCoins) {
+          throw new AppError(`Minimum withdrawal amount is ${minWithdrawalCoins} Coinz / ${minWithdrawalCoins} كونز`, 400);
         }
 
-        if (amountInCoinz < minWithdrawalUsd) {
-          const minLocal = isIraq ? (minWithdrawalUsd * rate).toFixed(0) + ' IQD' : '$' + minWithdrawalUsd.toFixed(2);
-          throw new AppError(`Minimum withdrawal amount is ${minLocal}`, 400);
+        if (amountInCoinz > maxWithdrawalCoins) {
+          throw new AppError(`Maximum withdrawal amount is ${maxWithdrawalCoins} Coinz / ${maxWithdrawalCoins} كونز`, 400);
         }
 
-        if (amountInCoinz > maxWithdrawalUsd) {
-          const maxLocal = isIraq ? (maxWithdrawalUsd * rate).toFixed(0) + ' IQD' : '$' + maxWithdrawalUsd.toFixed(2);
-          throw new AppError(`Maximum withdrawal amount is ${maxLocal}`, 400);
-        }
-
-        // Calculate dynamic fee
+        // Calculate dynamic fee in Coinz
         const feeFlatMicro = BigInt(sysConfig.withdrawal_fee_flat);
         const feePercentFactor = BigInt(Math.round(sysConfig.withdrawal_fee_percentage * 100)); // e.g. 250 for 2.50%
         
@@ -243,11 +236,8 @@ export class WalletService {
 
         if (avMicro < totalDeductMicro) {
           const balanceCoins = Number(avMicro) / 1000000;
-          const balanceLocal = isIraq ? (balanceCoins * rate).toFixed(0) + ' IQD' : '$' + balanceCoins.toFixed(2);
           const feeCoins = Number(totalFeeMicro) / 1000000.0;
-          const feeLocal = isIraq ? (feeCoins * rate).toFixed(0) + ' IQD' : '$' + feeCoins.toFixed(2);
-          const reqLocal = isIraq ? amount + ' IQD' : '$' + amount.toFixed(2);
-          throw new AppError(`Insufficient available balance (including withdrawal fee of ${feeLocal}). Requested: ${reqLocal}, Available: ${balanceLocal}`, 400);
+          throw new AppError(`Insufficient available balance (including withdrawal fee of ${feeCoins} Coinz). Requested: ${amountInCoinz} Coinz, Available: ${balanceCoins} Coinz`, 400);
         }
 
         // Check for any pending withdrawals to prevent spamming
@@ -267,7 +257,7 @@ export class WalletService {
           'WITHDRAWAL_REQUEST',
           -totalDeductUsd,
           { available_balance: avMicro - totalDeductMicro },
-          `Requested withdrawal of ${isIraq ? amount + ' IQD' : '$' + amount} to ${walletAddress} (Fee: ${Number(totalFeeMicro)/1000000.0} Coinz)`
+          `Requested withdrawal of ${amount} Coinz to ${walletAddress} (Fee: ${Number(totalFeeMicro)/1000000.0} Coinz)`
         );
 
         // Explicitly update user_balance_cache inside transaction
