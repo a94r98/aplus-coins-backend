@@ -7,12 +7,13 @@ export const registerSchema = z.object({
     username: z.string().min(3).max(50),
     email: z.string().email(),
     password: z.string().min(6),
-    phone: z.string().min(5).max(30),
+    phone: z.string().max(30).optional().nullable(),
     country: z.string().min(2).max(100),
     countryCode: z.string().min(2).max(10),
     age: z.number().int().min(16).max(100),
     deviceFingerprint: z.string().min(1),
     referralCode: z.string().optional(),
+    gender: z.enum(['MALE', 'FEMALE']).optional().nullable(),
   }),
 });
 
@@ -48,23 +49,25 @@ export const resetPasswordSchema = z.object({
   }),
 });
 
+
 export class AuthController {
   static async register(req: Request, res: Response, next: NextFunction) {
     try {
-      const { username, email, password, phone, country, countryCode, age, deviceFingerprint, referralCode } = req.body;
+      const { username, email, password, phone, country, countryCode, age, deviceFingerprint, referralCode, gender } = req.body;
       const ipAddress = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || '';
       
       const result = await AuthService.register({
         username,
         email,
         password_raw: password,
-        phone,
+        phone: phone || null,
         country,
         country_code: countryCode,
         age,
         device_fingerprint: deviceFingerprint,
         ipAddress,
         referrerCode: referralCode,
+        gender: gender || null,
       });
       
       res.status(201).json({

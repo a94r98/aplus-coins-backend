@@ -49,6 +49,14 @@ export class WalletService {
       [afterAv.toString(), afterPb.toString(), afterTe.toString(), afterTw.toString(), balanceUsd, userId]
     );
 
+    // Sync the confirmed balance cache
+    await client.query(
+      `INSERT INTO user_balance_cache (user_id, balance, updated_at)
+       VALUES ($1, $2, CURRENT_TIMESTAMP)
+       ON CONFLICT (user_id) DO UPDATE SET balance = EXCLUDED.balance, updated_at = CURRENT_TIMESTAMP`,
+      [userId, afterAv.toString()]
+    );
+
     await client.query(
       `INSERT INTO wallet_audit_logs (
         user_id, action, amount, 

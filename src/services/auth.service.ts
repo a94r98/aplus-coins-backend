@@ -53,6 +53,7 @@ export class AuthService {
     referrerCode?: string;
     device_fingerprint?: string;
     ipAddress?: string;
+    gender?: string;
   }) {
     const {
       username,
@@ -65,6 +66,7 @@ export class AuthService {
       referrerCode,
       device_fingerprint,
       ipAddress,
+      gender,
     } = payload;
 
     // 1. Check if registration is enabled
@@ -130,14 +132,14 @@ export class AuthService {
         `INSERT INTO users (
           username, email, password_hash, referral_code, referred_by,
           phone, country, country_code, age, device_fingerprint,
-          created_ip, last_ip, verification_token, is_verified
+          created_ip, last_ip, verification_token, is_verified, gender
          )
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, TRUE)
-         RETURNING id, username, email, vip_tier, referral_code, referred_by, balance, phone, country, country_code, age, is_verified, is_blocked, created_at`,
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, TRUE, $14)
+         RETURNING id, username, email, vip_tier, referral_code, referred_by, balance, phone, country, country_code, age, is_verified, is_blocked, created_at, gender`,
         [
           username, email, passwordHash, userReferralCode, referredByUserId,
-          phone, country, country_code, age, device_fingerprint,
-          ipAddress || null, ipAddress || null, verificationToken
+          phone || null, country, country_code, age, device_fingerprint,
+          ipAddress || null, ipAddress || null, verificationToken, gender || null
         ]
       );
 
